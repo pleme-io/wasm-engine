@@ -1,0 +1,63 @@
+[package]
+name = "wasm-engine"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89.0"
+authors = ["Pleme Team <team@pleme.io>"]
+description = "Wasmtime-based runtime that executes WASM/WASI modules dispatched by wasm-operator"
+license = "MIT"
+repository = "https://github.com/pleme-io/wasm-engine"
+homepage = "https://github.com/pleme-io/wasm-engine"
+readme = "README.md"
+keywords = ["wasm", "wasi", "wasmtime", "kubernetes", "tatara"]
+categories = ["command-line-utilities", "wasm"]
+exclude = ["target/", "result-*", "Cargo.nix", "flake.*", ".direnv/"]
+
+[[bin]]
+name = "wasm-engine"
+path = "src/main.rs"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.41", features = ["full"] }
+futures = "0.3"
+
+# HTTP server (service shape)
+axum = { version = "0.8", features = ["json"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+hyper = { version = "1.5", features = ["full"] }
+
+# HTTP client (module fetch)
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+# URL parsing
+url = "2.5"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
+
+# Hashing for blake3 content pinning
+blake3 = "1.5"
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+
+[lints.clippy]
+pedantic = "warn"
